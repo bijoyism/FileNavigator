@@ -34,6 +34,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 /**
  * Gets invoked when the user clicks the 'Delete file' notification action on the 'Move file' notification.
@@ -70,9 +71,21 @@ internal class FileDeletionActivity : LoggingComponentActivity() {
 
     private fun launchFileDeletion() {
         lifecycle.coroutineScope.launch {
-            val successfullyDeleted = with(Dispatchers.IO) {
-                contentResolver.delete(args.navigatableFile.mediaUri.uri, null) > 0
-            }
+            val successfullyDeleted = withContext(Dispatchers.IO) {
+    if (android.os.Build.VERSION.SDK_INT >= 30) {
+        contentResolver.delete(
+            args.navigatableFile.mediaUri.uri,
+            null
+        ) > 0
+    } else {
+        contentResolver.delete(
+            args.navigatableFile.mediaUri.uri,
+            null,
+            null
+        ) > 0
+    }
+}
+
             with(Dispatchers.Main) {
                 if (successfullyDeleted) {
                     showToast(
