@@ -1,3 +1,4 @@
+
 name: Build File Navigator APK
 
 on:
@@ -11,6 +12,7 @@ permissions:
 
 jobs:
   build:
+    name: Build Android APK
     runs-on: ubuntu-latest
 
     steps:
@@ -26,8 +28,11 @@ jobs:
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
 
-      - name: Set up Android SDK
-        uses: android-actions/setup-android@v3
+      - name: Check Android SDK
+        run: |
+          echo "ANDROID_HOME=$ANDROID_HOME"
+          test -d "$ANDROID_HOME"
+          echo "Android SDK directory exists."
 
       - name: Build debug APK
         run: |
@@ -41,4 +46,4 @@ jobs:
           name: FileNavigator-debug
           path: app/build/outputs/apk/debug/*.apk
           if-no-files-found: error
-          
+          retention-days: 7
